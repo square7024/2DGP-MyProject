@@ -1,5 +1,4 @@
 from pico2d import *
-
 from forest import Forest
 from knight import Knight
 
@@ -9,14 +8,16 @@ def handle_events():
     event_list = get_events()
     for event in event_list:
         if event.type == SDL_QUIT:
-            main.running = False
-        elif event.type == SDL_KEYDOWN:
-            if event.key == SDLK_ESCAPE:
-                main.running = False
+            running = False
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
+            running = False
+        else:
+            knight.handle_event(event)
 
 
 def reset_world():
     global world
+    global knight
 
     world = []
 
@@ -37,3 +38,16 @@ def render_world():
     for o in world:
         o.draw()
     update_canvas()
+
+running = True
+
+open_canvas(1280, 1024)
+reset_world()
+# game loop
+while running:
+    handle_events()
+    update_world()
+    render_world()
+    delay(0.01)
+# finalization code
+close_canvas()
