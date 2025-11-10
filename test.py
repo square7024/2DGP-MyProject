@@ -32,23 +32,27 @@ class Knight:
 
 def reset_world():
     global running
-    global forest
-    global knight
+    global world
 
     running = True
+    world = []
+
     forest = Forest()
+    world.append(forest)
+
     knight = Knight()
+    world.append(knight)
 
 
 def update_world():
-    forest.update()
-    knight.update()
+    for o in world:
+        o.update()
 
 
 def render_world():
     clear_canvas()
-    forest.draw()
-    knight.draw()
+    for o in world:
+        o.draw()
     update_canvas()
 
 def handle_events():
