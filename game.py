@@ -41,7 +41,10 @@ def render_world():
 
 running = True
 
-open_canvas(1280, 1024)
+w = 1280
+h = 1024
+
+open_canvas(w, h)
 reset_world()
 # game loop
 while running:

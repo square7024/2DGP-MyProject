@@ -3,10 +3,19 @@ from sdl2 import SDL_KEYDOWN, SDLK_SPACE, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT
 
 from state_machine import StateMachine
 
+h = 2360
+
 idle_sprite = [
     (0, 65), (68, 132), (133, 200), (204, 271), (270, 336),
     (336, 402), (404, 472), (473, 540), (540, 608), (607, 673),
     (680, 748), (748, 814), (814, 882)
+]
+
+run_sprite = [
+    (0, 284, 81, 353), (82, 284, 154, 353), (154, 287, 225, 356), (227, 288, 296, 360), (308, 288, 386, 356),
+    (386, 288, 459, 358), (458, 291, 531, 359), (531, 295, 603, 364), (608, 290, 688, 362), (688, 291, 761, 363),
+    (761, 292, 834, 362), (833, 295, 908, 361), (909, 294, 976, 362), (976, 295, 1045, 362)
+
 ]
 
 def right_down(e):
@@ -40,13 +49,13 @@ class Run:
 
     def draw(self):
         if self.knight.face_dir == 1:
-            self.knight.image.clip_draw(idle_sprite[self.knight.frame][0], 2275,
-                                        idle_sprite[self.knight.frame][1] - idle_sprite[self.knight.frame][0], 85,
+            self.knight.image.clip_draw(run_sprite[self.knight.frame][0], h - run_sprite[self.knight.frame][3],
+                                        idle_sprite[self.knight.frame][1] - idle_sprite[self.knight.frame][0], run_sprite[self.knight.frame][3] - run_sprite[self.knight.frame][1],
                                         self.knight.x, self.knight.y, 200, 200)
         else:
-            self.knight.image.clip_composite_draw(idle_sprite[self.knight.frame][0], 2275,
-                                                  idle_sprite[self.knight.frame][1] - idle_sprite[self.knight.frame][0],
-                                                  85, 0, 'h', self.knight.x, self.knight.y, 200, 200)
+            self.knight.image.clip_composite_draw(run_sprite[self.knight.frame][0], h - run_sprite[self.knight.frame][3],
+                                        idle_sprite[self.knight.frame][1] - idle_sprite[self.knight.frame][0], run_sprite[self.knight.frame][3] - run_sprite[self.knight.frame][1],
+                                                  0, 'h', self.knight.x, self.knight.y, 200, 200)
 
 class Idle:
     def __init__(self, knight):
@@ -64,13 +73,13 @@ class Idle:
 
     def draw(self):
         if self.knight.face_dir == 1:
-            self.knight.image.clip_draw(idle_sprite[self.knight.frame][0], 2275,
+            self.knight.image.clip_draw(idle_sprite[self.knight.frame][0], 2283,
                                         idle_sprite[self.knight.frame][1] - idle_sprite[self.knight.frame][0],
-                                        85, self.knight.x, self.knight.y, 200, 200)
+                                        77, self.knight.x, self.knight.y, 200, 200)
         else:
-            self.knight.image.clip_composite_draw(idle_sprite[self.knight.frame][0], 2275,
+            self.knight.image.clip_composite_draw(idle_sprite[self.knight.frame][0], 2283,
                                                   idle_sprite[self.knight.frame][1] - idle_sprite[self.knight.frame][0],
-                                                  85, 0, 'h', self.knight.x, self.knight.y, 200, 200)
+                                                  77, 0, 'h', self.knight.x, self.knight.y, 200, 200)
 
 class Knight:
     def __init__(self):
