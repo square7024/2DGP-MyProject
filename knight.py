@@ -1,4 +1,4 @@
-from pico2d import load_image
+from pico2d import load_image, load_font, draw_rectangle
 from sdl2 import SDL_KEYDOWN, SDLK_SPACE, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT
 
 import game_framework
@@ -8,14 +8,14 @@ h = 2360
 
 idle_sprite = [
     (0, 65), (68, 132), (133, 200), (204, 271), (270, 336),
-    (336, 402), (404, 472), (473, 540), (540, 608), (607, 673),
-    (680, 748), (748, 814), (814, 882)
+    (336, 402), (404, 472), (473, 540), (540, 606), (607, 673),
+    (680, 747), (748, 814), (814, 882)
 ]
 
 run_sprite = [
     (0, 284, 81, 353), (82, 284, 154, 353), (154, 287, 225, 356), (227, 288, 296, 360), (308, 288, 386, 356),
-    (386, 288, 459, 358), (458, 291, 531, 359), (531, 295, 603, 364), (608, 290, 688, 362), (688, 291, 761, 363),
-    (761, 292, 834, 362), (833, 295, 908, 361), (909, 294, 976, 362), (976, 295, 1045, 362)
+    (386, 288, 459, 358), (458, 291, 531, 359), (531, 295, 603, 364), (608, 290, 688, 362), (688, 291, 760, 363),
+    (761, 292, 833, 362), (833, 295, 908, 361), (909, 294, 976, 362), (976, 295, 1045, 362)
 
 ]
 
@@ -39,7 +39,7 @@ RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
 # Knight Action Speed
-TIME_PER_ACTION = 20 # 액션 당 걸리는 시간
+TIME_PER_ACTION = 1 # 액션 당 걸리는 시간
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION # 초당 액션 수
 FRAMES_PER_ACTION_RUN = 14
 FRAMES_PER_ACTION_IDLE = 13
@@ -69,9 +69,9 @@ class Run:
         height = y2 - y1
 
         if self.knight.face_dir == 1:
-            self.knight.image.clip_draw(x1, h - y2, width, height, self.knight.x, self.knight.y, 200, 200)
+            self.knight.image.clip_draw(x1, h - y2, width, height, self.knight.x - 45, self.knight.y, 200, 200)
         else:
-            self.knight.image.clip_composite_draw(x1, h - y2, width, height, 0, 'h', self.knight.x, self.knight.y, 200, 200)
+            self.knight.image.clip_composite_draw(x1, h - y2, width, height, 0, 'h', self.knight.x + 45, self.knight.y, 200, 200)
 
 class Idle:
     def __init__(self, knight):
@@ -88,17 +88,19 @@ class Idle:
         pass
 
     def draw(self):
+        idx = int(self.knight.frame)
+        x1, x2 = idle_sprite[idx]
+        width = x2 - x1
+
         if self.knight.face_dir == 1:
-            self.knight.image.clip_draw(idle_sprite[int(self.knight.frame)][0], 2283,
-                                        idle_sprite[int(self.knight.frame)][1] - idle_sprite[int(self.knight.frame)][0],
-                                        77, self.knight.x, self.knight.y, 200, 200)
+            self.knight.image.clip_draw(x1, 2283, width, 77, self.knight.x - 45, self.knight.y, 200, 200)
         else:
-            self.knight.image.clip_composite_draw(idle_sprite[int(self.knight.frame)][0], 2283,
-                                                  idle_sprite[int(self.knight.frame)][1] - idle_sprite[int(self.knight.frame)][0],
-                                                  77, 0, 'h', self.knight.x, self.knight.y, 200, 200)
+            self.knight.image.clip_composite_draw(x1, 2283, width, 77, 0, 'h', self.knight.x + 45, self.knight.y, 200, 200)
 
 class Knight:
     def __init__(self):
+        self.font = load_font('ENCR10B.TTF', 16)
+
         self.x, self.y = 400, 300
         self.frame = 0
         self.face_dir = 1
@@ -124,3 +126,9 @@ class Knight:
 
     def draw(self):
         self.state_machine.draw()
+        # self.font.draw(self.x - 60, self.y + 50, f'{self.frame}', (255, 255, 0))
+        draw_rectangle(*self.get_bb())
+
+    def get_bb(self):
+        return self.x - 20, self.y - 50, self.x + 20, self.y + 50
+
