@@ -4,7 +4,7 @@ from sdl2 import SDL_KEYDOWN, SDLK_SPACE, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT
 import game_framework
 from state_machine import StateMachine
 
-h = 2360
+sprite_h = 2360
 
 idle_sprite = [
     (0, 65), (68, 132), (133, 200), (204, 271), (270, 336),
@@ -17,6 +17,15 @@ run_sprite = [
     (386, 288, 459, 358), (458, 291, 531, 359), (531, 295, 603, 364), (608, 290, 688, 362), (688, 291, 760, 363),
     (761, 292, 833, 362), (833, 295, 908, 361), (909, 294, 976, 362), (976, 295, 1045, 362)
 
+]
+
+jump_sprite = [
+    (35, 378, 76, 462), (92, 376, 160, 451), (174, 377, 235, 453), (237, 391, 324, 448), (351, 367, 416, 448),
+    (428, 371, 504, 451), (511, 377, 580, 447), (597, 370, 673, 453), (683, 383, 763, 457)
+]
+
+attack_sprite = [
+    (14, 662, 84, 736), (94, 661, 151, 736), (172, 650, 289, 736), (304, 672, 363, 742), (389, 668, 441, 741)
 ]
 
 def right_down(e):
@@ -69,9 +78,9 @@ class Run:
         height = y2 - y1
 
         if self.knight.face_dir == 1:
-            self.knight.image.clip_draw(x1, h - y2, width, height, self.knight.x - 45, self.knight.y, 200, 200)
+            self.knight.image.clip_draw(x1, sprite_h - y2, width, height, self.knight.x - 45, self.knight.y, 200, 200)
         else:
-            self.knight.image.clip_composite_draw(x1, h - y2, width, height, 0, 'h', self.knight.x + 45, self.knight.y, 200, 200)
+            self.knight.image.clip_composite_draw(x1, sprite_h - y2, width, height, 0, 'h', self.knight.x + 45, self.knight.y, 200, 200)
 
 class Idle:
     def __init__(self, knight):
