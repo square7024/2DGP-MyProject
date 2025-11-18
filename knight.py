@@ -153,21 +153,24 @@ class Jump:
 
     def enter(self, e):
         self.knight.frame = 0
+        self.knight.yv = 10
 
     def exit(self, e):
         pass
 
     def do(self):
         self.knight.frame = self.knight.frame + FRAMES_PER_ACTION_JUMP * ACTION_PER_TIME * game_framework.frame_time
-        self.knight.yv -= GRAVITY * 2 * game_framework.frame_time
+        self.knight.yv -= GRAVITY * game_framework.frame_time
         self.knight.y += self.knight.yv * game_framework.frame_time * PIXEL_PER_METER
         if self.knight.y < 300:
+            self.knight.y = 300
+            self.knight.yv = 10
             self.knight.frame = 0
             self.knight.state_machine.handle_state_event(('JUMP', None))
 
     def draw(self):
         idx = int(self.knight.frame)
-        idx = max(0, min(idx, len(attack_sprite) - 1))
+        idx = max(0, min(idx, len(jump_sprite) - 1))
         x1, y1, x2, y2 = jump_sprite[idx]
         width = x2 - x1
         height = y2 - y1
