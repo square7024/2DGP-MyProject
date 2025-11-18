@@ -1,5 +1,5 @@
 from pico2d import load_image, load_font, draw_rectangle
-from sdl2 import SDL_KEYDOWN, SDLK_SPACE, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT
+from sdl2 import SDL_KEYDOWN, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT, SDLK_a
 
 import game_framework
 from state_machine import StateMachine
@@ -40,6 +40,11 @@ def right_up(e):
 def left_up(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_LEFT
 
+def a_down(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_a
+
+attack = lambda e: e[0] == 'ATTACK'
+
 # Knight Run Speed
 PIXEL_PER_METER = (10.0 / 0.2)  # 10 pixel 20 cm
 RUN_SPEED_KMPH = 20.0  # Km / Hour
@@ -52,6 +57,7 @@ TIME_PER_ACTION = 1 # 액션 당 걸리는 시간
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION # 초당 액션 수
 FRAMES_PER_ACTION_RUN = 14
 FRAMES_PER_ACTION_IDLE = 13
+FRAMES_PER_ACTION_ATTACK = 5
 
 class Run:
     def __init__(self, knight):
@@ -94,7 +100,6 @@ class Idle:
 
     def do(self):
         self.knight.frame = (self.knight.frame + FRAMES_PER_ACTION_RUN * ACTION_PER_TIME * game_framework.frame_time) % 13
-        pass
 
     def draw(self):
         idx = int(self.knight.frame)
@@ -105,6 +110,36 @@ class Idle:
             self.knight.image.clip_draw(x1, 2283, width, 77, self.knight.x - 45, self.knight.y, 200, 200)
         else:
             self.knight.image.clip_composite_draw(x1, 2283, width, 77, 0, 'h', self.knight.x + 45, self.knight.y, 200, 200)
+
+class Attack:
+    def __init__(self, knight):
+        self.knight = knight
+
+    def enter(self, e):
+        self.knight.frame = 0
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        self.knight.frame = self.knight.frame + FRAMES_PER_ACTION_ATTACK * ACTION_PER_TIME * 2 * game_framework.frame_time
+
+        if self.knight.frame >= 5:
+            self.knight.frame = 0
+            self.knight.state_machine.handle_state_event(('ATTACK', None))
+
+    def draw(self):
+        idx = int(self.knight.frame)
+        idx = max(0, min(idx, len(attack_sprite) - 1))
+        x1, y1, x2, y2 = attack_sprite[idx]
+        width = x2 - x1
+        height = y2 - y1
+
+        if self.knight.face_dir == 1:
+            self.knight.image.clip_draw(x1, sprite_h - y2, width, height, self.knight.x - 45, self.knight.y, 200, 200)
+        else:
+            self.knight.image.clip_composite_draw(x1, sprite_h - y2, width, height, 0, 'h', self.knight.x + 45, self.knight.y, 200, 200)
+
 
 class Knight:
     def __init__(self):
@@ -118,11 +153,13 @@ class Knight:
 
         self.IDLE = Idle(self)
         self.RUN = Run(self)
+        self.ATTACK = Attack(self)
         self.state_machine = StateMachine(
             self.IDLE,
             {
-                self.IDLE : {right_down: self.RUN, right_up: self.RUN, left_down: self.RUN, left_up: self.RUN},
-                self.RUN : {right_down: self.IDLE, right_up: self.IDLE, left_down: self.IDLE, left_up: self.IDLE}
+                self.IDLE : {right_down: self.RUN, right_up: self.RUN, left_down: self.RUN, left_up: self.RUN, a_down: self.ATTACK},
+                self.RUN : {right_down: self.IDLE, right_up: self.IDLE, left_down: self.IDLE, left_up: self.IDLE, a_down: self.ATTACK},
+                self.ATTACK : {attack: self.IDLE}
             }
 
         )
